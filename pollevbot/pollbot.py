@@ -28,7 +28,7 @@ class PollBot:
     def __init__(self, user: str, password: str, host: str,
                  login_type: str = 'uw', min_option: int = 0,
                  max_option: int = None, closed_wait: float = 5,
-                 open_wait: float = 5, lifetime: float = float('inf')):
+                 open_wait: float = 5, lifetime: float = float('inf'), screen_name: str):
         """
         Constructor. Creates a PollBot that answers polls on pollev.com.
 
@@ -47,6 +47,7 @@ class PollBot:
         :param lifetime: Lifetime of this PollBot (in seconds).
                         If float('inf'), runs forever.
         :raises ValueError: if login_type is not 'uw' or 'pollev'.
+        :param screen_name: Desired screen name to associate with yur responses.
         """
         if login_type not in {'uw', 'pollev'}:
             raise ValueError(f"'{login_type}' is not a supported login type. "
@@ -69,6 +70,7 @@ class PollBot:
         self.open_wait = open_wait
 
         self.lifetime = lifetime
+        self.screen_name = screen_name
         self.start_time = time.time()
 
         self.session = requests.Session()
@@ -290,7 +292,7 @@ class PollBot:
             return
         
         # Update the screen name here after login
-        if not self.update_screen_name("Edward He"):
+        if not self.update_screen_name(self.screen_name):
             logger.error("Screen name update failed. Proceeding without updating screen name.")
         
         while self.alive():
