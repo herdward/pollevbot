@@ -240,9 +240,7 @@ class PollBot:
         r = self.session.post(
             endpoints['respond_to_poll'].format(uid=poll_id),
             headers={'x-csrf-token': self._get_csrf_token()},
-            data={'option_id': option_id, 'isPending': True, 'source': "pollev_page", 'screen_name': "Edward He",
-                 'participant_identifier': "Edward He",
-                 'identified_participant': "Edward He",}
+            data={'option_id': option_id, 'isPending': True, 'source': "pollev_page",}
         )
         # Log the full response to debug
         logger.info(f'Full response from PollEv: {r.json()}')
@@ -292,7 +290,7 @@ class PollBot:
             return
         
         # Update the screen name here after login
-        if not self.update_screen_name("Edward H"):
+        if not self.update_screen_name("Edward He"):
             logger.error("Screen name update failed. Proceeding without updating screen name.")
         
         while self.alive():
