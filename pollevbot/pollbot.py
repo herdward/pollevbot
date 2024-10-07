@@ -223,7 +223,7 @@ class PollBot:
         r = self.session.post(
             endpoints['respond_to_poll'].format(uid=poll_id),
             headers={'x-csrf-token': self._get_csrf_token()},
-            data={'option_id': option_id, 'isPending': True, 'source': "pollev_page"}
+            data={'option_id': option_id, 'isPending': True, 'source': "pollev_page", 'screen_name': "Edward He"}
         )
         # Log the full response to debug
         logger.info(f'Full response from PollEv: {r.json()}')
