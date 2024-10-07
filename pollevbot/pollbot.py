@@ -234,6 +234,38 @@ class PollBot:
     def alive(self):
         return time.time() <= self.start_time + self.lifetime
 
+
+
+    def update_screen_name(self, screen_name: str):
+    """
+    Updates the screen name on PollEv.
+
+    :param screen_name: The desired screen name to use.
+    :return: True if successful, False otherwise.
+    """
+    # Get authenticity token from the page (assumes it's embedded in the HTML)
+    r = self.session.get(f"https://pollev.com/{self.host}/screen_name")
+    soup = BeautifulSoup(r.text, 'html.parser')
+    authenticity_token = soup.find('input', {'name': 'authenticity_token'})['value']
+
+    # Prepare the payload
+    payload = {
+        '_method': 'patch',
+        'authenticity_token': authenticity_token,
+        'participant_presenter_relationship[screen_name]': screen_name,
+        'button': ''
+    }
+
+    # Send the request to update the screen name
+    response = self.session.post(f"https://pollev.com/{self.host}/screen_name", data=payload)
+
+    if response.status_code == 200:
+        logger.info(f"Screen name successfully updated to {screen_name}.")
+        return True
+    else:
+        logger.error(f"Failed to update screen name. Status code: {response.status_code}")
+        return False
+
     def run(self):
         """Runs the script."""
         try:
@@ -242,10 +274,14 @@ class PollBot:
         except (LoginError, ValueError) as e:
             logger.error(e)
             return
-
+    
+        # Update the screen name here after login
+        if not self.update_screen_name("Edward H"):
+            logger.error("Screen name update failed. Proceeding without updating screen name.")
+    
         while self.alive():
             poll_id = self.get_new_poll_id(token)
-
+    
             if poll_id is None:
                 logger.info(f'`{self.host}` has not opened any new polls. '
                             f'Waiting {self.closed_wait} seconds before checking again.')
@@ -256,3 +292,4 @@ class PollBot:
                 time.sleep(self.open_wait)
                 r = self.answer_poll(poll_id)
                 logger.info(f'Received response: {r}')
+
