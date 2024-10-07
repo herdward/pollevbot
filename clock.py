@@ -52,11 +52,12 @@ def run():
     host = os.environ['POLLHOST']
     login_type = os.environ['LOGIN_TYPE']
     lifetime = float(os.environ['LIFETIME'])
+    screen_name = os.environ['SCREEN_NAME']
     
     logger.info(f"PollBot details: user={user}, host={host}, login_type={login_type}, lifetime={lifetime}")
     
     # Running the PollBot
-    with PollBot(user, password, host, login_type=login_type, lifetime=lifetime) as bot:
+    with PollBot(user, password, host, login_type=login_type, lifetime=lifetime, screen_name = screen_name) as bot:
         bot.run()
     
     logger.info(f"PollBot job finished at {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC")
