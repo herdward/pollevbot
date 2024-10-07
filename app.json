@@ -29,5 +29,7 @@
             "description": "Time to run pollevbot before terminating (in seconds). Set to inf to run forever.",
             "value": "3600"
         }
-    }
+        "SCREEN_NAME": {
+            "description" "Desired PollEv screen name",      
+        }
 }
