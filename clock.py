@@ -10,6 +10,7 @@ Required config variables:
     - MINUTE (cron string)
     - LOGIN_TYPE ('uw' or 'pollev')
     - LIFETIME
+    - SCREEN_NAME
 
 clock.py is a standalone program that schedules and runs
 pollevbot. It uses APScheduler's Cron triggers to simulate
@@ -38,7 +39,7 @@ logger = logging.getLogger(__name__)
 
 # Check for required config variables
 required_vars = {'USERNAME', 'PASSWORD', 'POLLHOST', 'DAY_OF_WEEK',
-                 'HOUR', 'MINUTE', 'LOGIN_TYPE', 'LIFETIME'}
+                 'HOUR', 'MINUTE', 'LOGIN_TYPE', 'LIFETIME', 'SCREEN_NAME'}
 missing_vars = sorted(required_vars - set(os.environ))
 assert len(missing_vars) == 0, f"Missing required config variables: {missing_vars}"
 
@@ -54,7 +55,7 @@ def run():
     lifetime = float(os.environ['LIFETIME'])
     screen_name = os.environ['SCREEN_NAME']
     
-    logger.info(f"PollBot details: user={user}, host={host}, login_type={login_type}, lifetime={lifetime}")
+    logger.info(f"PollBot details: user={user}, host={host}, login_type={login_type}, lifetime={lifetime}, screen_name = {screen_name}")
     
     # Running the PollBot
     with PollBot(user, password, host, login_type=login_type, lifetime=lifetime, screen_name = screen_name) as bot:
