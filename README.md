@@ -61,6 +61,7 @@ specifying what minutes to run pollevbot.
 * `PASSWORD`: PollEv account password.
 * `POLLHOST`: PollEv host name.
 * `USERNAME`: PollEv account username.
+* `SCREEN_NAME`: Desired PollEv Screen Name
 
 **Example**
 
@@ -76,6 +77,7 @@ variables as follows:
 * `PASSWORD`: `yourpassword`
 * `POLLHOST`: `teacher123`
 * `USERNAME`: `yourusername`
+* `SCREEN_NAME`: `yourscreenname`
 
 Then click `Deploy App` and wait for the app to finish building. 
 **pollevbot** is now deployed to Heroku! 
