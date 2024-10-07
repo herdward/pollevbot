@@ -211,6 +211,13 @@ class PollBot:
 
         url = endpoints['poll_data'].format(uid=poll_id)
         poll_data = self.session.get(url).json()
+        	
+        # Check the poll type to see if it's supported
+        poll_type = poll_data.get('poll', {}).get('poll_type', 'unknown')
+        if poll_type not in ['multiple_choice_poll']:
+            logger.warning(f'Skipping unsupported poll type: {poll_type}')
+            return {}
+            
         options = poll_data['options'][self.min_option:self.max_option]
         try:
             option_id = random.choice(options)['id']
