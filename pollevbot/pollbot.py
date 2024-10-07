@@ -209,25 +209,34 @@ class PollBot:
     def answer_poll(self, poll_id) -> dict:
         import random
 
-        url = endpoints['poll_data'].format(uid=poll_id)
-        poll_data = self.session.get(url).json()
-        	
-        # Check the poll type to see if it's supported
-        poll_type = poll_data.get('poll', {}).get('poll_type', 'unknown')
-        if poll_type not in ['multiple_choice_poll']:
-            logger.warning(f'Skipping unsupported poll type: {poll_type}')
+        try:
+            url = endpoints['poll_data'].format(uid=poll_id)
+            poll_data = self.session.get(url).json()
+    
+            ## THE BELOW DOES NOT WORK YET
+            # # Check the poll type to see if it's supported
+            # poll_type = poll_data.get('poll', {}).get('poll_type', 'unknown')
+            # if poll_type not in ['multiple_choice_poll']:
+            #     logger.warning(f'Skipping unsupported poll type: {poll_type}')
+            #     return {}
+            
+            options = poll_data['options'][self.min_option:self.max_option]
+            option_id = random.choice(options)['id']  # Pick a random option
+            r = self.session.post(
+                endpoints['respond_to_poll'].format(uid=poll_id),
+                headers={'x-csrf-token': self._get_csrf_token()},
+                data={'option_id': option_id}
+            )
+            logger.info(f'Full response from PollEv: {r.json()}')
+            return r.json()
+
+        except (IndexError, KeyError) as e:
+            logger.error(f"Error while trying to answer poll: {e}")
+            return {}
+        except requests.RequestException as e:
+            logger.error(f"Network-related error occurred: {e}")
             return {}
             
-        options = poll_data['options'][self.min_option:self.max_option]
-        try:
-            option_id = random.choice(options)['id']
-        except IndexError:
-            # `options` was empty
-            logger.error(f'Could not answer poll: poll only has '
-                         f'{len(poll_data["options"])} options but '
-                         f'self.min_option was {self.min_option} and '
-                         f'self.max_option: {self.max_option}')
-            return {}
         r = self.session.post(
             endpoints['respond_to_poll'].format(uid=poll_id),
             headers={'x-csrf-token': self._get_csrf_token()},
@@ -281,22 +290,27 @@ class PollBot:
         except (LoginError, ValueError) as e:
             logger.error(e)
             return
-    
+        
         # Update the screen name here after login
         if not self.update_screen_name("Edward H"):
             logger.error("Screen name update failed. Proceeding without updating screen name.")
-    
+        
         while self.alive():
-            poll_id = self.get_new_poll_id(token)
+            try:
+                poll_id = self.get_new_poll_id(token)
     
-            if poll_id is None:
-                logger.info(f'`{self.host}` has not opened any new polls. '
-                            f'Waiting {self.closed_wait} seconds before checking again.')
-                time.sleep(self.closed_wait)
-            else:
-                logger.info(f"{self.host} has opened a new poll! "
-                            f"Waiting {self.open_wait} seconds before responding.")
-                time.sleep(self.open_wait)
-                r = self.answer_poll(poll_id)
-                logger.info(f'Received response: {r}')
-
+                if poll_id is None:
+                    logger.info(f'`{self.host}` has not opened any new polls. '
+                                f'Waiting {self.closed_wait} seconds before checking again.')
+                    time.sleep(self.closed_wait)
+                else:
+                    logger.info(f"{self.host} has opened a new poll! "
+                                f"Waiting {self.open_wait} seconds before responding.")
+                    time.sleep(self.open_wait)
+                    r = self.answer_poll(poll_id)
+                    logger.info(f'Received response: {r}')
+            except Exception as e:
+                logger.error(f"Error encountered while processing poll: {e}")
+                logger.error("Skipping to next iteration...")
+                time.sleep(self.closed_wait)  # Ensure that bot doesn't immediately reattempt after an error
+    
