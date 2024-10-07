@@ -26,6 +26,7 @@ from pollevbot import PollBot
 from apscheduler.schedulers.blocking import BlockingScheduler
 import sys
 import warnings
+from datetime import datetime
 
 # Suppress SyntaxWarning related to tzlocal
 warnings.filterwarnings("ignore", category=SyntaxWarning)
@@ -42,7 +43,8 @@ missing_vars = sorted(required_vars - set(os.environ))
 assert len(missing_vars) == 0, f"Missing required config variables: {missing_vars}"
 
 def run():
-    logger.info("Executing PollBot run task")
+    current_time = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+    logger.info(f"PollBot job started at {current_time} UTC")
     
     # Heroku config vars
     user = os.environ['USERNAME']
@@ -57,7 +59,7 @@ def run():
     with PollBot(user, password, host, login_type=login_type, lifetime=lifetime) as bot:
         bot.run()
     
-    logger.info("PollBot run completed")
+    logger.info(f"PollBot job finished at {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC")
 
 def main():
     logger.info("Starting blocking scheduler.")
