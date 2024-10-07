@@ -3,6 +3,7 @@ import logging
 import time
 from typing import Optional
 from .endpoints import endpoints
+from bs4 import BeautifulSoup
 
 logger = logging.getLogger(__name__)
 __all__ = ['PollBot']
