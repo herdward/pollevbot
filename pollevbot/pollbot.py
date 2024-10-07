@@ -28,7 +28,7 @@ class PollBot:
     def __init__(self, user: str, password: str, host: str,
                  login_type: str = 'uw', min_option: int = 0,
                  max_option: int = None, closed_wait: float = 5,
-                 open_wait: float = 5, lifetime: float = float('inf'), screen_name: str):
+                 open_wait: float = 5, lifetime: float = float('inf'), screen_name: str = ''):
         """
         Constructor. Creates a PollBot that answers polls on pollev.com.
 
