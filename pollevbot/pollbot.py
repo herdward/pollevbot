@@ -1,6 +1,8 @@
 import requests
 import logging
 import time
+from typing import Optional
+from .endpoints import endpoints
 
 logger = logging.getLogger(__name__)
 
